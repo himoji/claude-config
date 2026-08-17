@@ -1,0 +1,160 @@
+{
+  "$schema": "https://madik.local/model-routing.v1.json",
+  "version": 1,
+  "updated": "2026-08-17",
+  "purpose": "Per-subagent model + reasoning-effort routing. Pay peak intelligence once at the orchestrator; farm everything else down the ladder.",
+
+  "benchmark": {
+    "index": "Artificial Analysis Intelligence Index",
+    "price": "USD per reference task-run, measured locally",
+    "note": "Update prices/index here when tiers change; every rule below is derived from this table."
+  },
+
+  "frontier": [
+    { "id": "haiku-4.5",  "model": "haiku",  "effort": "low",    "price": 0.22, "index": 30, "index_per_dollar": 136.4, "x_haiku": 1.00 },
+    { "id": "opus-low",   "model": "opus",   "effort": "low",    "price": 0.43, "index": 52, "index_per_dollar": 120.9, "x_haiku": 1.95 },
+    { "id": "opus-med",   "model": "opus",   "effort": "medium", "price": 0.72, "index": 59, "index_per_dollar":  81.9, "x_haiku": 3.27 },
+    { "id": "opus-high",  "model": "opus",   "effort": "high",   "price": 1.23, "index": 61, "index_per_dollar":  49.6, "x_haiku": 5.59 },
+    { "id": "opus-xhigh", "model": "opus",   "effort": "xhigh",  "price": 1.80, "index": 63, "index_per_dollar":  35.0, "x_haiku": 8.18 }
+  ],
+
+  "dominated": [
+    {
+      "id": "sonnet-5",
+      "price": 0.42,
+      "index": 43,
+      "reason": "opus-low costs $0.01 more (+2%) and scores 9 points higher (+21%). Strictly dominated — never select it.",
+      "action": "never_select"
+    }
+  ],
+
+  "marginal_cost_per_index_point": {
+    "haiku-4.5 -> opus-low": 0.0095,
+    "opus-low -> opus-med": 0.0414,
+    "opus-med -> opus-high": 0.2550,
+    "opus-high -> opus-xhigh": 0.2850,
+    "cliff": "opus-med -> opus-high",
+    "interpretation": "Climbing to opus-med is cheap. Climbing past it is 6.2x more expensive per point. opus-high/xhigh must be justified per call, never defaulted."
+  },
+
+  "tiers": {
+    "grunt": {
+      "label": "stupid work",
+      "definition": "Retrieval and execution with no judgement call. The answer is already in the repo or in a command's stdout; the agent just has to go get it.",
+      "tier": "haiku-4.5",
+      "agents": ["grunt", "scout"],
+      "examples": [
+        "find every file that imports X",
+        "run the test suite and report raw failures",
+        "list dependency versions / env vars / route definitions",
+        "collect and dedupe log lines around a timestamp",
+        "check whether a symbol still exists before I recommend it",
+        "mechanical exploration where the search pattern is already known"
+      ]
+    },
+    "code": {
+      "label": "code",
+      "definition": "Writing or changing code. Split by whether the shape of the change is already decided.",
+      "sub": {
+        "dumb": {
+          "definition": "The change is decided; only typing remains. No invariants at risk.",
+          "tier": "opus-low",
+          "agents": ["chore"],
+          "examples": [
+            "apply a decided rename/codemod across N files",
+            "boilerplate, scaffolding, config, fixtures",
+            "write tests for behaviour that is already specified",
+            "port a known pattern to a new file",
+            "mechanical type/lint/error fixes"
+          ]
+        },
+        "smart": {
+          "definition": "The change requires reasoning about correctness while writing it: invariants, concurrency, error paths, non-obvious bugs.",
+          "tier": "opus-med",
+          "agents": ["dev"],
+          "examples": [
+            "implement a feature end to end",
+            "debug a failure whose cause is not yet known",
+            "refactor across a boundary that carries invariants",
+            "anything touching auth, money, migrations, concurrency, data loss"
+          ]
+        }
+      }
+    },
+    "think": {
+      "label": "think",
+      "definition": "No code produced. Deciding what should happen, or judging whether what happened is right.",
+      "tier": "opus-high",
+      "peak_tier": "opus-xhigh",
+      "agents": ["sage", "oracle"],
+      "examples": [
+        "architecture and design tradeoffs",
+        "the orchestration turn itself (main loop)",
+        "reviewing a hard diff for correctness",
+        "adversarial verification of a claim before acting on it",
+        "final synthesis across many subagent reports"
+      ],
+      "peak_only": [
+        "one-shot and irreversible: migrations, public releases, security calls",
+        "a bug that has already defeated opus-med twice",
+        "the deciding judgement in a workflow whose fan-out cost dwarfs the call"
+      ]
+    }
+  },
+
+  "agents": {
+    "grunt":  { "model": "haiku", "effort": "low",    "tier": "haiku-4.5",  "class": "grunt",      "writes": false },
+    "scout":  { "model": "haiku", "effort": "medium", "tier": "haiku-4.5",  "class": "grunt",      "writes": false },
+    "chore":  { "model": "opus",  "effort": "low",    "tier": "opus-low",   "class": "code.dumb",  "writes": true  },
+    "dev":    { "model": "opus",  "effort": "medium", "tier": "opus-med",   "class": "code.smart", "writes": true  },
+    "sage":   { "model": "opus",  "effort": "high",   "tier": "opus-high",  "class": "think",      "writes": false },
+    "oracle": { "model": "opus",  "effort": "xhigh",  "tier": "opus-xhigh", "class": "think",      "writes": false }
+  },
+
+  "escalation": {
+    "policy": "Start at the cheapest plausible tier. Escalate on observed failure, never in anticipation of it.",
+    "ladder": ["grunt", "chore", "dev", "sage", "oracle"],
+    "triggers": [
+      "the agent returned an empty, hedged, or self-contradictory result",
+      "its output failed verification (tests, a check, a reading of the code)",
+      "it asked a question it was supposed to answer",
+      "same tier has now failed twice on the same task"
+    ],
+    "rules": [
+      "One rung at a time. Skipping rungs discards the cheap tier's findings.",
+      "Pass the failed attempt down as context so the higher tier does not restart from zero.",
+      "Two failures at the same rung = escalate, do not retry a third time.",
+      "Never escalate because a task merely sounds important. Escalate because a cheaper attempt actually failed."
+    ]
+  },
+
+  "session_defaults": {
+    "main_loop": {
+      "model": "opus",
+      "effort": "high",
+      "rationale": "The orchestrator is the think tier. xhigh buys +2 index points for +46% cost; take it deliberately, not by default.",
+      "settings_json": { "model": "opus[1m]", "effortLevel": "high" }
+    },
+    "unnamed_subagent_default": "grunt",
+    "never": ["sonnet"]
+  },
+
+  "workflow_defaults": {
+    "note": "Values for the Workflow tool's agent(prompt, {model, effort, agentType}).",
+    "discover":  { "agentType": "scout",  "model": "haiku", "effort": "medium" },
+    "mechanical":{ "agentType": "chore",  "model": "opus",  "effort": "low" },
+    "implement": { "agentType": "dev",    "model": "opus",  "effort": "medium" },
+    "verify":    { "agentType": "sage",   "model": "opus",  "effort": "high" },
+    "judge":     { "agentType": "oracle", "model": "opus",  "effort": "xhigh" },
+    "shape": "Fan out wide and cheap, converge narrow and expensive. Many grunts/chores, few sages, at most one oracle per workflow."
+  },
+
+  "rules": [
+    "Never select sonnet-5: opus-low dominates it on both price and index.",
+    "Default a subagent to the grunt tier and let failure pull it upward.",
+    "opus-med is the ceiling for anything that writes code, unless a cheaper attempt already failed.",
+    "opus-high/xhigh do not write code. They decide and they judge.",
+    "One thinker, many limbs: a single high-tier orchestrator dispatching cheap subagents beats a fleet of expensive ones.",
+    "Effort is per-agent and overrides the global effortLevel; a haiku agent under a global xhigh session still runs cheap."
+  ]
+}

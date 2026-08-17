@@ -1,0 +1,26 @@
+# This repo holds ONLY portable config. Nothing from ~/.claude that carries
+# conversation content, credentials, or machine-local state belongs here.
+#
+# Never commit, even if copied in by accident:
+history.jsonl
+projects/
+sessions/
+session-env/
+shell-snapshots/
+paste-cache/
+downloads/
+debug/
+cache/
+daemon/
+jobs/
+ide/
+plugins/
+statsig/
+*.log
+stats-cache.json
+settings.local.json
+.env
+.env.*
+*credentials*
+*token*
+.DS_Store

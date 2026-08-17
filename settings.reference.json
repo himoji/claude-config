@@ -1,0 +1,37 @@
+{
+  "_comment": [
+    "NOT auto-installed. This is the portable subset of ~/.claude/settings.json —",
+    "merge these keys by hand on a new machine, then re-add your own hooks.",
+    "",
+    "Deliberately omitted, because they are machine-specific:",
+    "  hooks                 - reference absolute paths (e.g. ~/.claude/hooks/rtk-rewrite.sh);",
+    "                          copy the hook scripts over first, then re-add.",
+    "  extraKnownMarketplaces- vercel-plugin uses a local directory source that will not",
+    "                          exist on another machine.",
+    "",
+    "effortLevel is the MAIN LOOP's effort — the orchestrator / think tier.",
+    "It does NOT affect subagents: each agent in agents/ sets its own effort:",
+    "in frontmatter, which overrides this. That is the whole point of the setup.",
+    "  high  = $1.23 / index 61   <- recommended default",
+    "  xhigh = $1.80 / index 63   (+46% cost for +2 points)"
+  ],
+
+  "model": "opus[1m]",
+  "effortLevel": "high",
+  "tui": "fullscreen",
+
+  "permissions": {
+    "defaultMode": "default",
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)"
+    ]
+  },
+
+  "enabledPlugins": {
+    "figma@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "swift-lsp@claude-plugins-official": true
+  }
+}
