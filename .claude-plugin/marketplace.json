@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "model-routing",
-      "description": "Cost-tiered subagents. Six agents each pinning their own model and reasoning effort, plus a session-start policy that routes work to the cheapest tier that can do it — so a grep never runs at orchestrator rates.",
+      "description": "Cost-tiered subagents. Six agents each pinning their own model and reasoning effort, plus a session-start policy that routes work to the cheapest tier that can do it \u2014 so a grep never runs at orchestrator rates.",
       "version": "1.0.0",
       "author": {
         "name": "madik",
@@ -17,7 +17,14 @@
       },
       "source": "./plugins/model-routing",
       "category": "workflow",
-      "tags": ["subagents", "cost", "routing", "orchestration", "effort"]
+      "tags": [
+        "subagents",
+        "cost",
+        "routing",
+        "orchestration",
+        "effort"
+      ],
+      "homepage": "https://github.com/himoji/claude-config"
     }
   ]
 }

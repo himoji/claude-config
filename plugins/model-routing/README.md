@@ -37,7 +37,7 @@ Also ships:
 ## Install
 
 ```bash
-/plugin marketplace add madik/claude-config
+/plugin marketplace add himoji/claude-config
 /plugin install model-routing@madik-claude-config
 ```
 
@@ -55,7 +55,7 @@ which is what makes this work on a headless box:
 {
   "extraKnownMarketplaces": {
     "madik-claude-config": {
-      "source": { "source": "github", "repo": "madik/claude-config" }
+      "source": { "source": "github", "repo": "himoji/claude-config" }
     }
   },
   "enabledPlugins": { "model-routing@madik-claude-config": true }
