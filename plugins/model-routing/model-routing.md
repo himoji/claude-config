@@ -1,6 +1,6 @@
 # Model routing
 
-Pick the cheapest tier that can do the job, then stop. Full table and rationale: `~/.claude/model-routing.json`.
+Pick the cheapest tier that can do the job, then stop. Full table and rationale: the `model-routing` skill.
 
 ## The ladder
 

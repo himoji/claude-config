@@ -1,33 +1,13 @@
-# claude-config
+# madik-claude-config
 
-Portable Claude Code config: cost-tiered subagents plus the routing policy that
-picks between them.
+A Claude Code plugin marketplace. Currently ships one plugin.
 
-## Install on a new machine
+## model-routing
 
-```bash
-git clone <remote> ~/Documents/git/claude-config
-~/Documents/git/claude-config/install.sh
-```
-
-Symlinks into `~/.claude`. Idempotent, and any real file it displaces is copied
-to `*.pre-link` first. Agent definitions load at session start, so open a new
-session afterwards.
-
-Then merge `settings.reference.json` into `~/.claude/settings.json` by hand —
-hooks and plugin marketplace entries carry absolute paths and don't travel.
-
-## What's here
-
-| path | scope |
-|---|---|
-| `agents/*.md` | six subagents, each pinning its own model + reasoning effort |
-| `model-routing.md` | the dispatch policy, imported by `~/.claude/CLAUDE.md` |
-| `model-routing.json` | prices, cost frontier, escalation rules, workflow defaults |
-| `settings.reference.json` | portable subset of settings.json — manual merge |
-| `RTK.md` | rtk proxy notes |
-
-## The ladder
+Cost-tiered subagents. Six agents, each pinning its own model and reasoning
+effort in frontmatter — which **overrides the session's global `effortLevel`**.
+That override is the whole mechanism: a `grunt` dispatched from an xhigh session
+still runs haiku-low, so lookups stop being billed at orchestrator rates.
 
 | agent | model / effort | cost | for |
 |---|---|---|---|
@@ -38,30 +18,97 @@ hooks and plugin marketplace entries carry absolute paths and don't travel.
 | `sage` | opus, high | 5.6× | architecture, review, verification |
 | `oracle` | opus, xhigh | 8.2× | irreversible, or twice-failed |
 
-Cost is measured $/task-run relative to haiku. Rationale and the full frontier
-math live in `model-routing.json`.
+Cost is measured $/task-run relative to haiku.
 
-Two rules do most of the work: **sonnet-5 is strictly dominated** by opus-low
-($0.01 more, +9 index points), and **escalation is triggered by observed
-failure**, never by a task sounding important.
+Two findings do most of the work. **sonnet-5 is strictly dominated** by opus-low
+— $0.01 more for +9 index points — so it appears nowhere in the ladder. And the
+**marginal cost per index point jumps 6.2× at `dev` → `sage`**, which is why
+escalation is triggered by observed failure rather than by anticipated
+difficulty: below that cliff guessing high costs pennies, above it guessing high
+is the main way to waste money.
 
-## Scope notes
+Also ships:
 
-`~/.claude/agents/` is user-level — it applies to every project on the machine.
-A project's own `.claude/agents/` wins on name collision, so a repo can override
-`dev` locally without touching this.
+- a **SessionStart hook** injecting the one-page dispatch policy, because a
+  policy loaded on demand cannot influence a decision already made
+- a **`model-routing` skill** with the frontier math, escalation rules, and
+  instructions for recomputing the table when prices move
 
-Per-agent `effort:` in frontmatter overrides the global `effortLevel`. A `grunt`
-dispatched from an xhigh session still runs haiku-low.
+## Install
+
+```bash
+/plugin marketplace add madik/claude-config
+/plugin install model-routing@madik-claude-config
+```
+
+From a local clone instead:
+
+```bash
+/plugin marketplace add ~/Documents/git/claude-config
+/plugin install model-routing@madik-claude-config
+```
+
+Or declaratively in `~/.claude/settings.json` — no interactive session needed,
+which is what makes this work on a headless box:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "madik-claude-config": {
+      "source": { "source": "github", "repo": "madik/claude-config" }
+    }
+  },
+  "enabledPlugins": { "model-routing@madik-claude-config": true }
+}
+```
+
+Agents and hooks load at session start — open a new session afterwards.
+
+## Layout
+
+```
+.claude-plugin/marketplace.json      marketplace manifest
+plugins/model-routing/
+  .claude-plugin/plugin.json         plugin manifest
+  agents/*.md                        6 agents (auto-discovered)
+  hooks/hooks.json                   SessionStart registration
+  hooks/session-start.sh             emits the policy
+  model-routing.md                   the policy
+  model-routing.json                 prices, frontier, escalation rules
+  skills/model-routing/SKILL.md      the cost model
+install.sh                           fallback: symlink into ~/.claude
+settings.reference.json              portable settings subset (manual merge)
+```
+
+`agents/` and `hooks/hooks.json` are discovered by convention, not declared in
+`plugin.json`. Only the non-default `skills/` location needs a manifest key.
+
+## install.sh is the fallback
+
+If you want the files in `~/.claude` without the plugin system:
+
+```bash
+./install.sh            # symlink into ~/.claude
+./install.sh --unlink   # remove those links
+```
+
+**Pick one path.** Running the symlink installer *and* installing the plugin
+gives you six duplicate agent names and the policy injected twice per session.
+`--unlink` before installing the plugin.
 
 ## Editing
 
-Because install.sh symlinks, editing `~/.claude/agents/dev.md` edits this repo.
-Commit and pull elsewhere.
+The plugin directory is the single source of truth — there are no duplicated
+copies to drift. Edit `plugins/model-routing/agents/dev.md`, commit, pull
+elsewhere.
+
+When prices or index scores change, edit `model-routing.json` first, then
+recompute before touching prose. Check whether any tier has become dominated,
+and whether the cliff has moved — the ladder's shape follows from where it sits.
 
 ## Do not vendor ~/.claude wholesale
 
 That directory also holds `history.jsonl`, `projects/`, and `sessions/` — your
-conversation transcripts. `.gitignore` here blocks them by name in case they
-ever get copied in, but the safer habit is to keep this repo a curated subset
-rather than a mirror.
+conversation transcripts. `.gitignore` blocks them by name in case they are ever
+copied in, but the safer habit is keeping this repo a curated subset rather than
+a mirror.

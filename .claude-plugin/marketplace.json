@@ -1,0 +1,23 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "madik-claude-config",
+  "description": "Personal Claude Code configuration, published as installable plugins.",
+  "owner": {
+    "name": "madik",
+    "email": "arlan.kanat2005@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "model-routing",
+      "description": "Cost-tiered subagents. Six agents each pinning their own model and reasoning effort, plus a session-start policy that routes work to the cheapest tier that can do it — so a grep never runs at orchestrator rates.",
+      "version": "1.0.0",
+      "author": {
+        "name": "madik",
+        "email": "arlan.kanat2005@gmail.com"
+      },
+      "source": "./plugins/model-routing",
+      "category": "workflow",
+      "tags": ["subagents", "cost", "routing", "orchestration", "effort"]
+    }
+  ]
+}
