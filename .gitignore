@@ -1,26 +1,36 @@
 # This repo holds ONLY portable config. Nothing from ~/.claude that carries
 # conversation content, credentials, or machine-local state belongs here.
 #
-# Never commit, even if copied in by accident:
-history.jsonl
-projects/
-sessions/
-session-env/
-shell-snapshots/
-paste-cache/
-downloads/
-debug/
-cache/
-daemon/
-jobs/
-ide/
-plugins/
-statsig/
-*.log
-stats-cache.json
-settings.local.json
+# Every path below is ANCHORED with a leading slash so it matches only at the
+# repo root — where an accidental ~/.claude copy would land. Unanchored
+# patterns match at every depth, which previously caused a bare "plugins/"
+# entry to silently swallow this repo's own plugins/ directory.
+
+# Conversation content — never commit.
+/history.jsonl
+/projects/
+/sessions/
+/session-env/
+/shell-snapshots/
+/paste-cache/
+/downloads/
+/debug/
+
+# Machine-local state.
+/cache/
+/daemon/
+/jobs/
+/ide/
+/statsig/
+/stats-cache.json
+/settings.local.json
+/settings.json
+
+# Credentials — unanchored on purpose; these must never appear at any depth.
 .env
 .env.*
 *credentials*
 *token*
+
+*.log
 .DS_Store

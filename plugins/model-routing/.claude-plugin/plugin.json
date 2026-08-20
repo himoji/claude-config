@@ -1,0 +1,12 @@
+{
+  "name": "model-routing",
+  "version": "1.0.0",
+  "description": "Cost-tiered subagents for Claude Code. Ships six agents — grunt, scout, chore, dev, sage, oracle — each pinning its own model and reasoning effort in frontmatter, which overrides the session's global effortLevel. A session-start hook injects the dispatch policy so work routes to the cheapest tier that can do it, and escalates only on observed failure.",
+  "author": {
+    "name": "madik",
+    "email": "arlan.kanat2005@gmail.com"
+  },
+  "license": "MIT",
+  "keywords": ["subagents", "cost-optimization", "model-routing", "reasoning-effort", "orchestration"],
+  "skills": "./skills/"
+}
