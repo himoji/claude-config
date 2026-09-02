@@ -32,5 +32,8 @@
 *credentials*
 *token*
 
+# Plugin-runtime lock dirs Claude Code writes into whatever it treats as a plugin root.
+.in_use/
+
 *.log
 .DS_Store

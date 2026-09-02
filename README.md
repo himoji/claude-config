@@ -15,14 +15,18 @@ still runs haiku-low, so lookups stop being billed at orchestrator rates.
 | `scout` | haiku, medium | 1.0× | open-ended search, no decisions |
 | `chore` | opus, low | 1.9× | code whose shape is already decided |
 | `dev` | opus, medium | 3.3× | code that needs correctness reasoning |
-| `sage` | opus, high | 5.6× | architecture, review, verification |
-| `oracle` | opus, xhigh | 8.2× | irreversible, or twice-failed |
+| `sage` | fable, high | 6.5× | architecture, review, verification |
+| `oracle` | fable, xhigh | 12.0× | irreversible, or twice-failed |
 
-Cost is measured $/task-run relative to haiku.
+Cost is measured $/task-run relative to haiku. `fable, max` (16.8×) is a
+ceiling, not a rung — used only when the user asks for it by name.
 
-Two findings do most of the work. **sonnet-5 is strictly dominated** by opus-low
-— $0.01 more for +9 index points — so it appears nowhere in the ladder. And the
-**marginal cost per index point jumps 6.2× at `dev` → `sage`**, which is why
+Three findings do most of the work. **sonnet-5 and fable-low are strictly
+dominated** — opus-low beats sonnet-5 for $0.01 more, opus-med beats fable-low
+for $0.05 *less* — so neither appears in the ladder. **`sage` and `oracle` sit on
+fable** (high, xhigh) because from `dev` those are the cheapest points per index
+point on the convex hull; opus-high and fable-med both lose that race. And the
+**marginal cost per index point jumps 5.7× at `dev` → `sage`**, which is why
 escalation is triggered by observed failure rather than by anticipated
 difficulty: below that cliff guessing high costs pennies, above it guessing high
 is the main way to waste money.
@@ -64,6 +68,41 @@ which is what makes this work on a headless box:
 
 Agents and hooks load at session start — open a new session afterwards.
 
+Non-interactively, from any shell:
+
+```bash
+claude plugin marketplace add himoji/claude-config
+claude plugin install model-routing@madik-claude-config
+```
+
+### Verify it loaded
+
+```bash
+claude plugin list
+ls ~/.claude/plugins/cache/madik-claude-config/model-routing/*/
+```
+
+The second command must list `agents/`, `hooks/`, `skills/`, `model-routing.md`
+and `.claude-plugin/`. In a new session the six agents show up in the Agent
+tool's type list and `model-routing:model-routing` in the skill list.
+
+### If Claude never picks it up
+
+The failure mode seen 2026-09: `enabledPlugins` said true, the marketplace
+clone was complete, but the install copy under
+`~/.claude/plugins/cache/madik-claude-config/model-routing/<version>/` was an
+empty directory holding only `.in_use/` lock files. Claude Code then loads
+nothing — no agents, no skill, no hook — and reports no error. Fix:
+
+```bash
+claude plugin marketplace update madik-claude-config
+claude plugin uninstall model-routing@madik-claude-config
+claude plugin install model-routing@madik-claude-config
+```
+
+then check the cache directory again. Bumping `version` in both manifests
+forces a fresh cache directory on reinstall, which is why releases bump it.
+
 ## Layout
 
 ```
@@ -103,8 +142,11 @@ copies to drift. Edit `plugins/model-routing/agents/dev.md`, commit, pull
 elsewhere.
 
 When prices or index scores change, edit `model-routing.json` first, then
-recompute before touching prose. Check whether any tier has become dominated,
-and whether the cliff has moved — the ladder's shape follows from where it sits.
+recompute before touching prose. Check whether any point has become dominated,
+whether the convex-hull walk still lands on the same rungs, and whether the
+cliff has moved — the ladder's shape follows from where it sits. Bump `version`
+in `plugin.json` and `marketplace.json` so the reinstall lands in a fresh cache
+directory.
 
 ## Do not vendor ~/.claude wholesale
 

@@ -1,7 +1,7 @@
 {
   "$schema": "https://madik.local/model-routing.v1.json",
-  "version": 1,
-  "updated": "2026-08-17",
+  "version": 2,
+  "updated": "2026-09-03",
   "purpose": "Per-subagent model + reasoning-effort routing. Pay peak intelligence once at the orchestrator; farm everything else down the ladder.",
 
   "benchmark": {
@@ -10,13 +10,25 @@
     "note": "Update prices/index here when tiers change; every rule below is derived from this table."
   },
 
-  "frontier": [
-    { "id": "haiku-4.5",  "model": "haiku",  "effort": "low",    "price": 0.22, "index": 30, "index_per_dollar": 136.4, "x_haiku": 1.00 },
-    { "id": "opus-low",   "model": "opus",   "effort": "low",    "price": 0.43, "index": 52, "index_per_dollar": 120.9, "x_haiku": 1.95 },
-    { "id": "opus-med",   "model": "opus",   "effort": "medium", "price": 0.72, "index": 59, "index_per_dollar":  81.9, "x_haiku": 3.27 },
-    { "id": "opus-high",  "model": "opus",   "effort": "high",   "price": 1.23, "index": 61, "index_per_dollar":  49.6, "x_haiku": 5.59 },
-    { "id": "opus-xhigh", "model": "opus",   "effort": "xhigh",  "price": 1.80, "index": 63, "index_per_dollar":  35.0, "x_haiku": 8.18 }
+  "measured": [
+    { "id": "haiku-4.5",   "model": "haiku", "effort": "low",    "price": 0.22, "index": 30, "index_per_dollar": 136.4, "x_haiku": 1.00 },
+    { "id": "sonnet-5",    "model": "sonnet","effort": "medium", "price": 0.42, "index": 43, "index_per_dollar": 102.4, "x_haiku": 1.91 },
+    { "id": "opus-low",    "model": "opus",  "effort": "low",    "price": 0.43, "index": 52, "index_per_dollar": 120.9, "x_haiku": 1.95 },
+    { "id": "opus-med",    "model": "opus",  "effort": "medium", "price": 0.72, "index": 59, "index_per_dollar":  81.9, "x_haiku": 3.27 },
+    { "id": "fable-low",   "model": "fable", "effort": "low",    "price": 0.77, "index": 58, "index_per_dollar":  75.3, "x_haiku": 3.50 },
+    { "id": "fable-med",   "model": "fable", "effort": "medium", "price": 1.00, "index": 60, "index_per_dollar":  60.0, "x_haiku": 4.55 },
+    { "id": "opus-high",   "model": "opus",  "effort": "high",   "price": 1.23, "index": 61, "index_per_dollar":  49.6, "x_haiku": 5.59 },
+    { "id": "fable-high",  "model": "fable", "effort": "high",   "price": 1.43, "index": 62, "index_per_dollar":  43.4, "x_haiku": 6.50 },
+    { "id": "opus-xhigh",  "model": "opus",  "effort": "xhigh",  "price": 1.80, "index": 63, "index_per_dollar":  35.0, "x_haiku": 8.18 },
+    { "id": "fable-xhigh", "model": "fable", "effort": "xhigh",  "price": 2.65, "index": 65, "index_per_dollar":  24.5, "x_haiku": 12.05 },
+    { "id": "fable-max",   "model": "fable", "effort": "max",    "price": 3.69, "index": 66, "index_per_dollar":  17.9, "x_haiku": 16.77 }
   ],
+
+  "ladder": {
+    "note": "The rungs agents actually pin. Chosen by walking the lower-left convex hull of `measured`: from each rung, take the next point with the cheapest $/index-point. Points not on the hull are skipped, not because they are bad, but because a neighbour buys the same points cheaper.",
+    "rungs": ["haiku-4.5", "opus-low", "opus-med", "fable-high", "fable-xhigh"],
+    "ceiling": "fable-max"
+  },
 
   "dominated": [
     {
@@ -25,16 +37,39 @@
       "index": 43,
       "reason": "opus-low costs $0.01 more (+2%) and scores 9 points higher (+21%). Strictly dominated — never select it.",
       "action": "never_select"
+    },
+    {
+      "id": "fable-low",
+      "price": 0.77,
+      "index": 58,
+      "reason": "opus-med costs $0.05 less (-7%) and scores 1 point higher. Strictly dominated — never select it.",
+      "action": "never_select"
+    }
+  ],
+
+  "off_hull": [
+    {
+      "id": "fable-med",
+      "reason": "From opus-med it buys +1 point for $0.28. fable-high buys +3 for $0.71 ($0.237/pt) — cheaper per point and strictly more capable. Skipped."
+    },
+    {
+      "id": "opus-high",
+      "reason": "From opus-med it buys +2 for $0.51 ($0.255/pt). fable-high buys +3 for $0.71 ($0.237/pt) — cheaper per point and one point higher. Skipped; this was the old sage tier."
+    },
+    {
+      "id": "opus-xhigh",
+      "reason": "Technically on the hull (+1 over fable-high for $0.37) but a peak rung that clears sage by one point is not worth an agent. oracle takes fable-xhigh (+3 over sage) instead."
     }
   ],
 
   "marginal_cost_per_index_point": {
     "haiku-4.5 -> opus-low": 0.0095,
     "opus-low -> opus-med": 0.0414,
-    "opus-med -> opus-high": 0.2550,
-    "opus-high -> opus-xhigh": 0.2850,
-    "cliff": "opus-med -> opus-high",
-    "interpretation": "Climbing to opus-med is cheap. Climbing past it is 6.2x more expensive per point. opus-high/xhigh must be justified per call, never defaulted."
+    "opus-med -> fable-high": 0.2367,
+    "fable-high -> fable-xhigh": 0.4067,
+    "fable-xhigh -> fable-max": 1.0400,
+    "cliff": "opus-med -> fable-high",
+    "interpretation": "Climbing to opus-med is cheap. Climbing past it is 5.7x more expensive per point. fable-high/xhigh must be justified per call, never defaulted. fable-max is the worst step on the board ($1.04 for one point) and is never an agent tier."
   },
 
   "tiers": {
@@ -84,8 +119,9 @@
     "think": {
       "label": "think",
       "definition": "No code produced. Deciding what should happen, or judging whether what happened is right.",
-      "tier": "opus-high",
-      "peak_tier": "opus-xhigh",
+      "tier": "fable-high",
+      "peak_tier": "fable-xhigh",
+      "ceiling_tier": "fable-max",
       "agents": ["sage", "oracle"],
       "examples": [
         "architecture and design tradeoffs",
@@ -98,17 +134,21 @@
         "one-shot and irreversible: migrations, public releases, security calls",
         "a bug that has already defeated opus-med twice",
         "the deciding judgement in a workflow whose fan-out cost dwarfs the call"
+      ],
+      "ceiling_only": [
+        "the user asked for max by name",
+        "nothing else — $1.04 for one index point is not a routing decision an agent gets to make"
       ]
     }
   },
 
   "agents": {
-    "grunt":  { "model": "haiku", "effort": "low",    "tier": "haiku-4.5",  "class": "grunt",      "writes": false },
-    "scout":  { "model": "haiku", "effort": "medium", "tier": "haiku-4.5",  "class": "grunt",      "writes": false },
-    "chore":  { "model": "opus",  "effort": "low",    "tier": "opus-low",   "class": "code.dumb",  "writes": true  },
-    "dev":    { "model": "opus",  "effort": "medium", "tier": "opus-med",   "class": "code.smart", "writes": true  },
-    "sage":   { "model": "opus",  "effort": "high",   "tier": "opus-high",  "class": "think",      "writes": false },
-    "oracle": { "model": "opus",  "effort": "xhigh",  "tier": "opus-xhigh", "class": "think",      "writes": false }
+    "grunt":  { "model": "haiku", "effort": "low",    "tier": "haiku-4.5",   "class": "grunt",      "writes": false },
+    "scout":  { "model": "haiku", "effort": "medium", "tier": "haiku-4.5",   "class": "grunt",      "writes": false },
+    "chore":  { "model": "opus",  "effort": "low",    "tier": "opus-low",    "class": "code.dumb",  "writes": true  },
+    "dev":    { "model": "opus",  "effort": "medium", "tier": "opus-med",    "class": "code.smart", "writes": true  },
+    "sage":   { "model": "fable", "effort": "high",   "tier": "fable-high",  "class": "think",      "writes": false },
+    "oracle": { "model": "fable", "effort": "xhigh",  "tier": "fable-xhigh", "class": "think",      "writes": false }
   },
 
   "escalation": {
@@ -124,19 +164,20 @@
       "One rung at a time. Skipping rungs discards the cheap tier's findings.",
       "Pass the failed attempt down as context so the higher tier does not restart from zero.",
       "Two failures at the same rung = escalate, do not retry a third time.",
-      "Never escalate because a task merely sounds important. Escalate because a cheaper attempt actually failed."
+      "Never escalate because a task merely sounds important. Escalate because a cheaper attempt actually failed.",
+      "There is no rung above oracle. fable-max is reached only when the user names it."
     ]
   },
 
   "session_defaults": {
     "main_loop": {
-      "model": "opus",
+      "model": "fable",
       "effort": "high",
-      "rationale": "The orchestrator is the think tier. xhigh buys +2 index points for +46% cost; take it deliberately, not by default.",
-      "settings_json": { "model": "opus[1m]", "effortLevel": "high" }
+      "rationale": "The orchestrator is the think tier and sits on the same rung as sage. xhigh buys +3 index points for +85% cost; take it deliberately, not by default.",
+      "settings_json": { "model": "fable[1m]", "effortLevel": "high" }
     },
     "unnamed_subagent_default": "grunt",
-    "never": ["sonnet"]
+    "never": ["sonnet", "fable-low"]
   },
 
   "workflow_defaults": {
@@ -144,16 +185,18 @@
     "discover":  { "agentType": "scout",  "model": "haiku", "effort": "medium" },
     "mechanical":{ "agentType": "chore",  "model": "opus",  "effort": "low" },
     "implement": { "agentType": "dev",    "model": "opus",  "effort": "medium" },
-    "verify":    { "agentType": "sage",   "model": "opus",  "effort": "high" },
-    "judge":     { "agentType": "oracle", "model": "opus",  "effort": "xhigh" },
+    "verify":    { "agentType": "sage",   "model": "fable", "effort": "high" },
+    "judge":     { "agentType": "oracle", "model": "fable", "effort": "xhigh" },
     "shape": "Fan out wide and cheap, converge narrow and expensive. Many grunts/chores, few sages, at most one oracle per workflow."
   },
 
   "rules": [
     "Never select sonnet-5: opus-low dominates it on both price and index.",
+    "Never select fable-low: opus-med dominates it on both price and index.",
     "Default a subagent to the grunt tier and let failure pull it upward.",
     "opus-med is the ceiling for anything that writes code, unless a cheaper attempt already failed.",
-    "opus-high/xhigh do not write code. They decide and they judge.",
+    "fable-high/xhigh do not write code. They decide and they judge.",
+    "fable-max is not a tier. It is a ceiling the user has to ask for by name.",
     "One thinker, many limbs: a single high-tier orchestrator dispatching cheap subagents beats a fleet of expensive ones.",
     "Effort is per-agent and overrides the global effortLevel; a haiku agent under a global xhigh session still runs cheap."
   ]

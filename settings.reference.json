@@ -12,11 +12,14 @@
     "effortLevel is the MAIN LOOP's effort — the orchestrator / think tier.",
     "It does NOT affect subagents: each agent in agents/ sets its own effort:",
     "in frontmatter, which overrides this. That is the whole point of the setup.",
-    "  high  = $1.23 / index 61   <- recommended default",
-    "  xhigh = $1.80 / index 63   (+46% cost for +2 points)"
+    "Main-loop rungs (fable 5.1, measured $/task-run and index):",
+    "  high  = $1.43 / index 62   <- recommended default; same rung as sage",
+    "  xhigh = $2.65 / index 65   (+85% cost for +3 points)",
+    "  max   = $3.69 / index 66   (+39% cost for +1 point; ask for it by name, never default)",
+    "fable low ($0.77 / 58) is dominated by opus medium ($0.72 / 59) — never a main-loop choice either."
   ],
 
-  "model": "opus[1m]",
+  "model": "fable[1m]",
   "effortLevel": "high",
   "tui": "fullscreen",
 
