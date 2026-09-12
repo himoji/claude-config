@@ -95,6 +95,16 @@ to waste money — and above it the waste is measured per call, which is why the
 ladder picks by absolute price there (`critic` before `sage`, `judge` before
 `oracle`).
 
+## The autonomous ceiling
+
+`dev` for code, `critic` for judgement. `sage`, `judge`, `oracle` and
+`fable-max` are **user-named tiers**: the agent never dispatches them on its
+own, no matter how hard or consequential the task looks. When `critic` or
+`dev` has failed twice, the correct move is to stop and report — what failed,
+which tier you would escalate to, and what it costs — and let the user decide
+whether to pay. A grant in the user's current message ("use sage", "escalate
+if needed", "go up to oracle") is what unlocks the rung.
+
 ## Assigning a tier
 
 Ask in order, stop at the first yes:
@@ -105,10 +115,12 @@ Ask in order, stop at the first yes:
 3. Is it code whose correctness needs reasoning while writing? → `dev`
 4. Is it a decision or judgement, producing no code? → `critic`
 5. Does it carry auth/money/migration/concurrency invariants, move an
-   architectural boundary, or has `critic` failed once? → `sage`
-6. Is it irreversible, or has a cheaper tier already failed twice? → `judge`
-   when a backup/flag/rollback exists, `oracle` when nothing can undo it or
-   `judge` has failed
+   architectural boundary, or has `critic` failed once? → ask for `sage`
+6. Is it irreversible, or has a cheaper tier already failed twice? → ask for
+   `judge` when a backup/flag/rollback exists, `oracle` when nothing can undo
+   it or `judge` has failed
+
+Steps 5–6 are requests to the user, not dispatches.
 
 The common misroute is treating *consequential* as *difficult*. A production
 config change can be mechanical; route it to `chore` and verify carefully.
@@ -130,11 +142,14 @@ difficulty.
 - Always pass the failed attempt down as context. The higher tier restarting
   from zero is how you pay twice for the same work.
 - Two failures at one rung means escalate, not retry a third time.
+- Past `critic`, escalation is a question to the user, not an action. Report
+  the failed attempt and the proposed tier with its cost, then wait.
 - There is no rung above `oracle`. If `oracle` fails, the problem is the
   premise, not the model; go back and check what every tier assumed.
 
 Escalating past `dev` needs a stated reason. "This seems hard" is not one;
-"`dev` produced a fix that failed its own test twice" is.
+"`dev` produced a fix that failed its own test twice" is — and even then, past
+`critic` the reason is presented to the user rather than acted on.
 
 ## De-escalation
 

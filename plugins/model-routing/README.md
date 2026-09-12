@@ -20,8 +20,10 @@ still runs haiku-low, so lookups stop being billed at orchestrator rates.
 | `judge` | opus, xhigh | 8.2× | irreversible but recoverable, or `dev`+`sage` failed |
 | `oracle` | fable, xhigh | 12.0× | unrecoverable, or `judge` failed |
 
-Cost is measured $/task-run relative to haiku. `fable, max` (16.8×) is a
-ceiling, not a rung — used only when the user asks for it by name.
+Cost is measured $/task-run relative to haiku. **The agent's own ceiling is
+`dev` for code and `critic` for judgement**; `sage`, `judge`, `oracle` and
+`fable, max` (16.8×) are dispatched only when the user asks for them. Failure
+above that line is reported with a proposed tier and its cost, not acted on.
 
 Three findings do most of the work. **sonnet-5 and fable-low are strictly
 dominated** — opus-low beats sonnet-5 for $0.01 more, opus-med beats fable-low

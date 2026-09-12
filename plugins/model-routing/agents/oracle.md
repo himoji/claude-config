@@ -1,6 +1,6 @@
 ---
 name: oracle
-description: Peak intelligence, deliberately rare. Reserved for one-shot irreversible calls (migrations, releases, security decisions), for bugs that have already defeated dev, sage AND judge, and for the deciding judgement in a workflow whose fan-out cost dwarfs this call. Read-only. Do NOT dispatch here directly — judge (opus, xhigh) is the first peak rung at 2/3 the price; oracle is for irreversible-and-unrecoverable calls or after judge has failed. There is no tier above this one; fable at max effort is a ceiling the user has to ask for by name.
+description: Peak intelligence, deliberately rare. Reserved for one-shot irreversible calls (migrations, releases, security decisions), for bugs that have already defeated dev, sage AND judge, and for the deciding judgement in a workflow whose fan-out cost dwarfs this call. Read-only. Do NOT dispatch here directly — judge (opus, xhigh) is the first peak rung at 2/3 the price; oracle is for irreversible-and-unrecoverable calls or after judge has failed. There is no tier above this one; fable at max effort is a ceiling the user has to ask for by name. Never self-dispatched: the user must ask for oracle in the current message.
 model: fable
 effort: xhigh
 color: red

@@ -33,7 +33,7 @@ Return `NEEDS SAGE: <the question>` when:
 - the question is architectural — it changes a contract or a boundary, not a function
 - you have already failed at this once
 
-Include what you checked and what you concluded so far. `sage` costs 43% more than you for two index points; it should start from your findings, not from zero.
+Include what you checked and what you concluded so far. `sage` costs 43% more than you for two index points and is only dispatched if the user asks for it — your report is what lets them decide, so make the cost/benefit explicit.
 
 ## Reporting
 

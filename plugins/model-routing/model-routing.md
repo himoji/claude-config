@@ -15,14 +15,17 @@ Pick the cheapest tier that can do the job, then stop. Full table and rationale:
 | `judge` | opus, xhigh | 8.2× | **peak, recoverable** — irreversible-but-undoable calls (backup, flag, rollback exists), or `dev`+`sage` both failed. Read-only. |
 | `oracle` | fable, xhigh | 12.0× | **peak, unrecoverable** — no rollback path, or `judge` failed. Rare by design. |
 
-Multipliers are vs. haiku on measured cost. No step on the ladder is more than 1.5× the one below it. `fable, max` (16.8×) is a ceiling, not a rung: use it only when the user asks for it by name.
+Multipliers are vs. haiku on measured cost. No step on the ladder is more than 1.5× the one below it.
+
+**Autonomous ceiling: `dev` for code, `critic` for judgement.** `sage`, `judge`, `oracle` and `fable, max` are dispatched only when the user asks for them in the current message (by name, or by explicitly allowing escalation). Never on your own judgement, however hard or important the task looks.
 
 ## Rules
 
+0. **Do not get expensive unless asked.** Nothing above `critic` is dispatched autonomously. If `critic` (or `dev`) has failed twice, stop and report: what failed, what you'd escalate to, what it costs. The user decides whether to pay for `sage`/`judge`/`oracle`.
 1. **Never sonnet-5, never fable-low.** Each is strictly dominated: opus-low beats sonnet-5 for $0.01 more; opus-med beats fable-low for $0.05 *less*. Model name is not a tier — the (model, effort) pair is.
-2. **`grunt` is the default subagent, `critic` is the default thinker.** `sage`/`judge`/`oracle` are reached by failure or by stakes, not by default.
+2. **`grunt` is the default subagent, `critic` is the default thinker.** `sage`/`judge`/`oracle` are reached only by the user asking — failure and stakes are reasons to *ask*, not to escalate.
 3. **`dev` is the ceiling for writing code.** The four think tiers decide and judge; they don't hold the keyboard.
-4. **Escalate on observed failure, never in anticipation.** One rung at a time, passing the failed attempt down as context. Two failures at a rung means escalate, not retry.
+4. **Escalate on observed failure, never in anticipation.** One rung at a time, passing the failed attempt down as context. Two failures at a rung means escalate, not retry — and past `critic`, escalating means asking the user first.
 5. **One thinker, many limbs.** The main loop is the think tier; it should be dispatching cheap subagents, not doing lookups itself. Every `Grep` a high-effort agent runs personally is billed at its own rate.
 6. **Effort is per-agent and overrides the global `effortLevel`.** A `grunt` in an xhigh session still runs cheap — that's the whole mechanism.
 
@@ -42,8 +45,10 @@ Ask, in order:
 2. Is it code, and is the shape already decided? → `chore`
 3. Is it code, and does writing it require reasoning about correctness? → `dev`
 4. Is it a decision or a judgement, with no code produced? → `critic`
-5. Does that judgement cover auth/money/migrations/concurrency, redraw an architectural boundary, or has `critic` already failed once? → `sage`
-6. Is it irreversible, or has a cheaper tier already failed twice? → `judge` if a rollback/backup/flag exists, `oracle` if nothing can undo it or `judge` failed
+5. Does that judgement cover auth/money/migrations/concurrency, redraw an architectural boundary, or has `critic` already failed once? → **ask the user** for `sage`
+6. Is it irreversible, or has a cheaper tier already failed twice? → **ask the user** for `judge` (rollback/backup/flag exists) or `oracle` (nothing can undo it, or `judge` failed)
+
+Steps 5–6 never dispatch on their own. The user's message must name the tier or grant the escalation.
 
 Sounding important is not a reason to escalate. A cheaper attempt actually failing is.
 
@@ -61,4 +66,4 @@ agent(p, {agentType: 'judge',  model: 'opus',  effort: 'xhigh'})   // final judg
 agent(p, {agentType: 'oracle', model: 'fable', effort: 'xhigh'})   // final judgement, unrecoverable stakes
 ```
 
-Fan-out stages take the cheap tiers. Verification fans out on `critic`; only the converging stage pays for `sage` or above.
+Fan-out stages take the cheap tiers. Verification fans out on `critic`; the converging stage pays for `sage` or above only when the user asked for it.

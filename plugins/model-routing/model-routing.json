@@ -1,6 +1,6 @@
 {
   "$schema": "https://madik.local/model-routing.v1.json",
-  "version": 3,
+  "version": 4,
   "updated": "2026-09-12",
   "purpose": "Per-subagent model + reasoning-effort routing. Pay peak intelligence once at the orchestrator; farm everything else down the ladder.",
   "benchmark": {
@@ -334,12 +334,24 @@
       "same tier has now failed twice on the same task"
     ],
     "rules": [
+      "Do not get expensive unless asked. critic is the autonomous ceiling; sage/judge/oracle require the user to ask in the current message. Two failures at critic = stop and report (what failed, proposed tier, its cost), not escalate.",
       "One rung at a time. Skipping rungs discards the cheap tier's findings.",
       "Pass the failed attempt down as context so the higher tier does not restart from zero.",
       "Two failures at the same rung = escalate, do not retry a third time.",
-      "Above dev, stakes may skip a rung (auth/money/migration diff -> sage directly; unrecoverable call -> oracle directly). Difficulty never may.",
+      "Once the user has granted an escalation, stakes may still skip a rung within the grant (auth/money/migration diff -> sage directly; unrecoverable call -> oracle directly). Difficulty never may.",
       "Never escalate because a task merely sounds important. Escalate because a cheaper attempt actually failed.",
       "There is no rung above oracle. fable-max is reached only when the user names it."
+    ],
+    "ladder_autonomous": [
+      "grunt",
+      "chore",
+      "dev",
+      "critic"
+    ],
+    "ladder_user_named": [
+      "sage",
+      "judge",
+      "oracle"
     ]
   },
   "session_defaults": {
@@ -356,7 +368,18 @@
     "never": [
       "sonnet",
       "fable-low"
-    ]
+    ],
+    "autonomous_ceiling": {
+      "code": "dev",
+      "think": "critic",
+      "user_named_only": [
+        "sage",
+        "judge",
+        "oracle",
+        "fable-max"
+      ],
+      "rule": "Nothing above critic is dispatched on the agent's own judgement. Failure or stakes are reasons to ASK the user for the next rung, naming what failed and what it costs; the user's current message must name the tier or grant the escalation."
+    }
   },
   "workflow_defaults": {
     "note": "Values for the Workflow tool's agent(prompt, {model, effort, agentType}).",
@@ -398,12 +421,13 @@
     "shape": "Fan out wide and cheap, converge narrow and expensive. Many grunts/chores, critics for the verify fan-out, few sages, at most one judge or oracle per workflow."
   },
   "rules": [
+    "Do not get expensive unless asked: sage, judge, oracle and fable-max are user-named tiers. The agent's own ceiling is dev for code and critic for judgement.",
     "Never select sonnet-5: opus-low dominates it on both price and index.",
     "Never select fable-low: opus-med dominates it on both price and index.",
     "Default a subagent to the grunt tier and a judgement to the critic tier; let failure or stakes pull them upward.",
     "opus-med is the ceiling for anything that writes code, unless a cheaper attempt already failed.",
     "critic/sage/judge/oracle do not write code. They decide and they judge.",
-    "Above the cliff pick by absolute price: critic before sage ($0.43 less per call), judge before oracle ($0.85 less). The pricier rung is earned by a failure or by unrecoverable stakes.",
+    "Above the cliff pick by absolute price: critic before sage ($0.43 less per call), judge before oracle ($0.85 less). The pricier rung is granted by the user, never self-assigned.",
     "fable-max is not a tier. It is a ceiling the user has to ask for by name.",
     "One thinker, many limbs: a single high-tier orchestrator dispatching cheap subagents beats a fleet of expensive ones.",
     "Effort is per-agent and overrides the global effortLevel; a haiku agent under a global xhigh session still runs cheap."

@@ -1,6 +1,6 @@
 ---
 name: judge
-description: The cheaper peak — one-shot calls that are irreversible but recoverable (a dev-box migration with a backup, a release that can be rolled back), bugs that have defeated dev and sage, and the deciding judgement in a workflow whose fan-out cost dwarfs this call. Read-only. Use BEFORE oracle: judge is opus at xhigh, one index point over sage for 26% more; oracle is another 47% on top for two more points. Escalate to oracle only when judge has failed or the call is irreversible AND unrecoverable.
+description: The cheaper peak — one-shot calls that are irreversible but recoverable (a dev-box migration with a backup, a release that can be rolled back), bugs that have defeated dev and sage, and the deciding judgement in a workflow whose fan-out cost dwarfs this call. Read-only. Use BEFORE oracle: judge is opus at xhigh, one index point over sage for 26% more; oracle is another 47% on top for two more points. Escalate to oracle only when judge has failed or the call is irreversible AND unrecoverable. Never self-dispatched: the user must ask for judge (or grant escalation) in the current message.
 model: opus
 effort: xhigh
 color: orange
