@@ -1,6 +1,6 @@
 ---
 name: scout
-description: Cheap read-only codebase exploration where the search pattern is not obvious up front — "where does X actually get handled", "how is this flow wired", "find every call site of this and tell me which ones matter". Use for open-ended search that needs light synthesis but no design decisions. Prefer grunt when the pattern is already known; escalate to sage when the question is really about what the design should be.
+description: Cheap read-only codebase exploration where the search pattern is not obvious up front — "where does X actually get handled", "how is this flow wired", "find every call site of this and tell me which ones matter". Use for open-ended search that needs light synthesis but no design decisions. Prefer grunt when the pattern is already known; escalate to critic when the question is really about what the design should be.
 model: haiku
 effort: medium
 color: cyan

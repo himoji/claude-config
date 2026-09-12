@@ -9,8 +9,8 @@
   "plugins": [
     {
       "name": "model-routing",
-      "description": "Cost-tiered subagents. Six agents each pinning their own model and reasoning effort (haiku 4.5, opus, fable 5.1), plus a session-start policy that routes work to the cheapest tier that can do it — so a grep never runs at orchestrator rates.",
-      "version": "1.1.0",
+      "description": "Cost-tiered subagents. Eight agents each pinning their own model and reasoning effort (haiku 4.5, opus, fable 5.1), plus a session-start policy that routes work to the cheapest tier that can do it — so a grep never runs at orchestrator rates.",
+      "version": "1.2.0",
       "author": {
         "name": "madik",
         "email": "arlan.kanat2005@gmail.com"
