@@ -1,168 +1,232 @@
 {
   "$schema": "https://madik.local/model-routing.v1.json",
-  "version": 4,
-  "updated": "2026-09-12",
+  "version": 5,
+  "updated": "2026-09-22",
   "purpose": "Per-subagent model + reasoning-effort routing. Pay peak intelligence once at the orchestrator; farm everything else down the ladder.",
   "benchmark": {
     "index": "Artificial Analysis Intelligence Index",
     "price": "USD per reference task-run, measured locally",
-    "note": "Update prices/index here when tiers change; every rule below is derived from this table."
+    "note": "Update prices/index here when tiers change; every rule below is derived from this table. 2026-09-22: re-measured on the updated AA index — scores are NOT comparable with version <=4 of this file. Opus is Opus 5.5."
   },
   "measured": [
     {
       "id": "haiku-4.5",
       "model": "haiku",
       "effort": "low",
-      "price": 0.22,
-      "index": 30,
-      "index_per_dollar": 136.4,
+      "price": 0.21,
+      "index": 17,
+      "index_per_dollar": 81.0,
       "x_haiku": 1.0
     },
     {
-      "id": "sonnet-5",
+      "id": "sonnet-low",
       "model": "sonnet",
-      "effort": "medium",
-      "price": 0.42,
-      "index": 43,
-      "index_per_dollar": 102.4,
-      "x_haiku": 1.91
+      "effort": "low",
+      "price": 0.51,
+      "index": 24,
+      "index_per_dollar": 47.1,
+      "x_haiku": 2.43
     },
     {
       "id": "opus-low",
       "model": "opus",
       "effort": "low",
-      "price": 0.43,
-      "index": 52,
-      "index_per_dollar": 120.9,
-      "x_haiku": 1.95
+      "price": 0.55,
+      "index": 42,
+      "index_per_dollar": 76.4,
+      "x_haiku": 2.62
+    },
+    {
+      "id": "sonnet-med",
+      "model": "sonnet",
+      "effort": "medium",
+      "price": 1.0,
+      "index": 28,
+      "index_per_dollar": 28.0,
+      "x_haiku": 4.76
     },
     {
       "id": "opus-med",
       "model": "opus",
       "effort": "medium",
-      "price": 0.72,
-      "index": 59,
-      "index_per_dollar": 81.9,
-      "x_haiku": 3.27
+      "price": 1.34,
+      "index": 51,
+      "index_per_dollar": 38.1,
+      "x_haiku": 6.38
+    },
+    {
+      "id": "sonnet-high",
+      "model": "sonnet",
+      "effort": "high",
+      "price": 1.79,
+      "index": 32,
+      "index_per_dollar": 17.9,
+      "x_haiku": 8.52
+    },
+    {
+      "id": "opus-high",
+      "model": "opus",
+      "effort": "high",
+      "price": 1.82,
+      "index": 54,
+      "index_per_dollar": 29.7,
+      "x_haiku": 8.67
     },
     {
       "id": "fable-low",
       "model": "fable",
       "effort": "low",
-      "price": 0.77,
-      "index": 58,
-      "index_per_dollar": 75.3,
-      "x_haiku": 3.5
+      "price": 2.37,
+      "index": 47,
+      "index_per_dollar": 19.8,
+      "x_haiku": 11.29
+    },
+    {
+      "id": "sonnet-xhigh",
+      "model": "sonnet",
+      "effort": "xhigh",
+      "price": 2.87,
+      "index": 34,
+      "index_per_dollar": 11.8,
+      "x_haiku": 13.67
     },
     {
       "id": "fable-med",
       "model": "fable",
       "effort": "medium",
-      "price": 1.0,
-      "index": 60,
-      "index_per_dollar": 60.0,
-      "x_haiku": 4.55
+      "price": 2.98,
+      "index": 49,
+      "index_per_dollar": 16.4,
+      "x_haiku": 14.19
     },
     {
-      "id": "opus-high",
+      "id": "opus-xhigh",
       "model": "opus",
-      "effort": "high",
-      "price": 1.23,
-      "index": 61,
-      "index_per_dollar": 49.6,
-      "x_haiku": 5.59
+      "effort": "xhigh",
+      "price": 3.46,
+      "index": 56,
+      "index_per_dollar": 16.2,
+      "x_haiku": 16.48
     },
     {
       "id": "fable-high",
       "model": "fable",
       "effort": "high",
-      "price": 1.43,
-      "index": 62,
-      "index_per_dollar": 43.4,
-      "x_haiku": 6.5
+      "price": 3.91,
+      "index": 51,
+      "index_per_dollar": 13.0,
+      "x_haiku": 18.62
     },
     {
-      "id": "opus-xhigh",
+      "id": "sonnet-max",
+      "model": "sonnet",
+      "effort": "max",
+      "price": 5.0,
+      "index": 38,
+      "index_per_dollar": 7.6,
+      "x_haiku": 23.81
+    },
+    {
+      "id": "opus-max",
       "model": "opus",
-      "effort": "xhigh",
-      "price": 1.8,
-      "index": 63,
-      "index_per_dollar": 35.0,
-      "x_haiku": 8.18
+      "effort": "max",
+      "price": 5.98,
+      "index": 58,
+      "index_per_dollar": 9.7,
+      "x_haiku": 28.48
     },
     {
       "id": "fable-xhigh",
       "model": "fable",
       "effort": "xhigh",
-      "price": 2.65,
-      "index": 65,
-      "index_per_dollar": 24.5,
-      "x_haiku": 12.05
+      "price": 5.98,
+      "index": 53,
+      "index_per_dollar": 8.9,
+      "x_haiku": 28.48
     },
     {
       "id": "fable-max",
       "model": "fable",
       "effort": "max",
-      "price": 3.69,
-      "index": 66,
-      "index_per_dollar": 17.9,
-      "x_haiku": 16.77
+      "price": 7.63,
+      "index": 53,
+      "index_per_dollar": 6.9,
+      "x_haiku": 36.33
     }
   ],
   "ladder": {
-    "note": "The rungs agents actually pin. The code side follows the lower-left convex hull of `measured`. The think side deliberately adds two rungs that are NOT hull-optimal per index point (fable-med, opus-xhigh) because they are cheaper in absolute price: a think call that does not need the extra points saves 30-32% on every dispatch, and the ladder never steps more than 1.5x between neighbours.",
+    "note": "The rungs agents actually pin: the lower-left convex hull of `measured`, which is now all Opus 5.5 above haiku. Every Fable 5.1 point and every Sonnet 5 point is dominated or off hull, so the think tiers moved onto opus and `judge` was retired (no hull point is left between sage and oracle).",
     "rungs": [
       "haiku-4.5",
       "opus-low",
       "opus-med",
-      "fable-med",
-      "fable-high",
+      "opus-high",
       "opus-xhigh",
-      "fable-xhigh"
+      "opus-max"
     ],
-    "max_step_ratio": 1.47,
-    "ceiling": "fable-max"
+    "max_step_ratio": 2.62,
+    "ceiling": "opus-max"
   },
   "dominated": [
     {
-      "id": "sonnet-5",
-      "price": 0.42,
-      "index": 43,
-      "reason": "opus-low costs $0.01 more (+2%) and scores 9 points higher (+21%). Strictly dominated — never select it.",
+      "id": "sonnet-low",
+      "price": 0.51,
+      "index": 24,
+      "reason": "Not strictly dominated, but opus-low costs $0.04 more (+8%) for 18 more points (+75%). Off hull by a wide margin — never select it.",
+      "action": "never_select"
+    },
+    {
+      "id": "sonnet-med/high/xhigh/max",
+      "price": null,
+      "index": null,
+      "reason": "Each is strictly dominated: opus-low ($0.55 / 42) beats every one of them on both price and index.",
       "action": "never_select"
     },
     {
       "id": "fable-low",
-      "price": 0.77,
-      "index": 58,
-      "reason": "opus-med costs $0.05 less (-7%) and scores 1 point higher. Strictly dominated — never select it.",
+      "price": 2.37,
+      "index": 47,
+      "reason": "opus-med costs $1.03 less and scores 4 points higher.",
       "action": "never_select"
-    }
-  ],
-  "off_hull": [
-    {
-      "id": "opus-high",
-      "reason": "From opus-med it buys +2 for $0.51 ($0.255/pt). fable-high buys +3 for $0.71 ($0.237/pt) and fable-med buys +1 for $0.28 with a lower absolute price. Squeezed from both sides; this was the pre-1.1 sage tier."
     },
     {
       "id": "fable-med",
-      "reason": "Off the strict hull ($0.28/pt vs fable-high's $0.237/pt from opus-med) but ON the ladder as `critic`: $0.43 cheaper per call than sage, and most judgement calls do not need sage's +2 points. Added in 1.2.0 to close the 2x gap between dev and sage."
+      "price": 2.98,
+      "index": 49,
+      "reason": "opus-med costs $1.64 less and scores 2 points higher.",
+      "action": "never_select"
     },
     {
-      "id": "opus-xhigh",
-      "reason": "On the hull (+1 over fable-high for $0.37) and ON the ladder as `judge` since 1.2.0: $0.85 cheaper per call than oracle. Was the 1.0 oracle tier. Closes the 1.85x gap between sage and oracle."
+      "id": "fable-high",
+      "price": 3.91,
+      "index": 51,
+      "reason": "opus-med scores the same 51 for $1.34 — 34% of the price.",
+      "action": "never_select"
+    },
+    {
+      "id": "fable-xhigh",
+      "price": 5.98,
+      "index": 53,
+      "reason": "opus-high scores 54 for $1.82 — under a third of the price.",
+      "action": "never_select"
+    },
+    {
+      "id": "fable-max",
+      "price": 7.63,
+      "index": 53,
+      "reason": "No gain over fable-xhigh for +28%; opus-high beats it at 24% of the price.",
+      "action": "never_select"
     }
   ],
+  "off_hull": [],
   "marginal_cost_per_index_point": {
-    "haiku-4.5 -> opus-low": 0.0095,
-    "opus-low -> opus-med": 0.0414,
-    "opus-med -> fable-med": 0.28,
-    "fable-med -> fable-high": 0.215,
-    "fable-high -> opus-xhigh": 0.37,
-    "opus-xhigh -> fable-xhigh": 0.425,
-    "fable-xhigh -> fable-max": 1.04,
-    "cliff": "opus-med -> fable-med",
-    "interpretation": "Climbing to opus-med is cheap. The first step past it is 6.8x more expensive per point and every later step stays in the $0.22-0.43/pt band. Above the cliff choose by absolute price: critic before sage, judge before oracle. fable-max is the worst step on the board ($1.04 for one point) and is never an agent tier."
+    "haiku-4.5 -> opus-low": 0.0136,
+    "opus-low -> opus-med": 0.0878,
+    "opus-med -> opus-high": 0.16,
+    "opus-high -> opus-xhigh": 0.82,
+    "opus-xhigh -> opus-max": 1.26,
+    "cliff": "opus-high -> opus-xhigh",
+    "interpretation": "Climbing to opus-high is cheap: every point up to it costs at most $0.16. The next step costs $0.82/pt — 5.1x worse — and the last one $1.26/pt. The cliff now sits between critic and sage, so the autonomous ceiling (critic) is the last rung below it."
   },
   "tiers": {
     "grunt": {
@@ -218,15 +282,12 @@
     "think": {
       "label": "think",
       "definition": "No code produced. Deciding what should happen, or judging whether what happened is right.",
-      "tier": "fable-med",
-      "hard_tier": "fable-high",
-      "peak_tier": "opus-xhigh",
-      "unrecoverable_tier": "fable-xhigh",
-      "ceiling_tier": "fable-max",
+      "tier": "opus-high",
+      "hard_tier": "opus-xhigh",
+      "peak_tier": "opus-max",
       "agents": [
         "critic",
         "sage",
-        "judge",
         "oracle"
       ],
       "examples": [
@@ -244,17 +305,10 @@
         "critic failed once"
       ],
       "peak_only": [
-        "one-shot but recoverable: a migration with a backup, a release with a rollback, a flag that can be flipped back",
+        "one-shot irreversible calls: migrations, releases, security decisions, prod data deletion, key rotation",
         "a bug that has already defeated dev and sage",
-        "the deciding judgement in a workflow whose fan-out cost dwarfs the call"
-      ],
-      "unrecoverable_only": [
-        "irreversible AND no rollback/backup/flag exists: prod data deletion, key rotation, public security disclosure",
-        "judge failed"
-      ],
-      "ceiling_only": [
-        "the user asked for max by name",
-        "nothing else — $1.04 for one index point is not a routing decision an agent gets to make"
+        "the deciding judgement in a workflow whose fan-out cost dwarfs the call",
+        "sage failed"
       ]
     }
   },
@@ -288,31 +342,24 @@
       "writes": true
     },
     "critic": {
-      "model": "fable",
-      "effort": "medium",
-      "tier": "fable-med",
+      "model": "opus",
+      "effort": "high",
+      "tier": "opus-high",
       "class": "think",
       "writes": false
     },
     "sage": {
-      "model": "fable",
-      "effort": "high",
-      "tier": "fable-high",
-      "class": "think.hard",
-      "writes": false
-    },
-    "judge": {
       "model": "opus",
       "effort": "xhigh",
       "tier": "opus-xhigh",
-      "class": "think.peak",
+      "class": "think.hard",
       "writes": false
     },
     "oracle": {
-      "model": "fable",
-      "effort": "xhigh",
-      "tier": "fable-xhigh",
-      "class": "think.unrecoverable",
+      "model": "opus",
+      "effort": "max",
+      "tier": "opus-max",
+      "class": "think.peak",
       "writes": false
     }
   },
@@ -324,7 +371,6 @@
       "dev",
       "critic",
       "sage",
-      "judge",
       "oracle"
     ],
     "triggers": [
@@ -334,13 +380,13 @@
       "same tier has now failed twice on the same task"
     ],
     "rules": [
-      "Do not get expensive unless asked. critic is the autonomous ceiling; sage/judge/oracle require the user to ask in the current message. Two failures at critic = stop and report (what failed, proposed tier, its cost), not escalate.",
+      "Do not get expensive unless asked. critic is the autonomous ceiling; sage/oracle require the user to ask in the current message. Two failures at critic = stop and report (what failed, proposed tier, its cost), not escalate.",
       "One rung at a time. Skipping rungs discards the cheap tier's findings.",
       "Pass the failed attempt down as context so the higher tier does not restart from zero.",
       "Two failures at the same rung = escalate, do not retry a third time.",
-      "Once the user has granted an escalation, stakes may still skip a rung within the grant (auth/money/migration diff -> sage directly; unrecoverable call -> oracle directly). Difficulty never may.",
+      "Once the user has granted an escalation, stakes may still skip a rung within the grant (auth/money/migration diff -> sage directly; irreversible call -> oracle directly). Difficulty never may.",
       "Never escalate because a task merely sounds important. Escalate because a cheaper attempt actually failed.",
-      "There is no rung above oracle. fable-max is reached only when the user names it."
+      "There is no rung above oracle (opus, max)."
     ],
     "ladder_autonomous": [
       "grunt",
@@ -350,33 +396,30 @@
     ],
     "ladder_user_named": [
       "sage",
-      "judge",
       "oracle"
     ]
   },
   "session_defaults": {
     "main_loop": {
-      "model": "fable",
+      "model": "opus",
       "effort": "high",
-      "rationale": "The orchestrator is the think tier and sits on the same rung as sage. Drop to fable medium (critic's rung, -30%) for sessions that are mostly dispatching; xhigh buys +3 index points for +85% and is taken deliberately, not by default.",
+      "rationale": "The orchestrator is the think tier and sits on critic's rung — the last one below the cliff. xhigh buys +2 index points for +90% and is taken deliberately, not by default; max is another +73% for +2.",
       "settings_json": {
-        "model": "fable[1m]",
+        "model": "opus[1m]",
         "effortLevel": "high"
       }
     },
     "unnamed_subagent_default": "grunt",
     "never": [
-      "sonnet",
-      "fable-low"
+      "sonnet (any effort)",
+      "fable (any effort)"
     ],
     "autonomous_ceiling": {
       "code": "dev",
       "think": "critic",
       "user_named_only": [
         "sage",
-        "judge",
-        "oracle",
-        "fable-max"
+        "oracle"
       ],
       "rule": "Nothing above critic is dispatched on the agent's own judgement. Failure or stakes are reasons to ASK the user for the next rung, naming what failed and what it costs; the user's current message must name the tier or grant the escalation."
     }
@@ -400,35 +443,29 @@
     },
     "verify": {
       "agentType": "critic",
-      "model": "fable",
-      "effort": "medium"
+      "model": "opus",
+      "effort": "high"
     },
     "verify_hard": {
       "agentType": "sage",
-      "model": "fable",
-      "effort": "high"
-    },
-    "judge": {
-      "agentType": "judge",
       "model": "opus",
       "effort": "xhigh"
     },
-    "judge_unrecoverable": {
+    "shape": "Fan out wide and cheap, converge narrow and expensive. Many grunts/chores, critics for the verify fan-out, few sages, at most one oracle per workflow.",
+    "peak": {
       "agentType": "oracle",
-      "model": "fable",
-      "effort": "xhigh"
-    },
-    "shape": "Fan out wide and cheap, converge narrow and expensive. Many grunts/chores, critics for the verify fan-out, few sages, at most one judge or oracle per workflow."
+      "model": "opus",
+      "effort": "max"
+    }
   },
   "rules": [
-    "Do not get expensive unless asked: sage, judge, oracle and fable-max are user-named tiers. The agent's own ceiling is dev for code and critic for judgement.",
-    "Never select sonnet-5: opus-low dominates it on both price and index.",
-    "Never select fable-low: opus-med dominates it on both price and index.",
+    "Do not get expensive unless asked: sage and oracle are user-named tiers. The agent's own ceiling is dev for code and critic for judgement.",
+    "Never select sonnet 5 at any effort: opus-low beats sonnet-low by 18 points for $0.04 more, and strictly dominates every higher sonnet effort.",
+    "Never select fable 5.1 at any effort: every fable point is strictly dominated by an opus point that is cheaper and scores at least as high.",
     "Default a subagent to the grunt tier and a judgement to the critic tier; let failure or stakes pull them upward.",
     "opus-med is the ceiling for anything that writes code, unless a cheaper attempt already failed.",
-    "critic/sage/judge/oracle do not write code. They decide and they judge.",
-    "Above the cliff pick by absolute price: critic before sage ($0.43 less per call), judge before oracle ($0.85 less). The pricier rung is granted by the user, never self-assigned.",
-    "fable-max is not a tier. It is a ceiling the user has to ask for by name.",
+    "critic/sage/oracle do not write code. They decide and they judge.",
+    "Above the cliff pick by absolute price: sage costs $1.64 more per call than critic, oracle $2.52 more than sage. Those rungs are granted by the user, never self-assigned.",
     "One thinker, many limbs: a single high-tier orchestrator dispatching cheap subagents beats a fleet of expensive ones.",
     "Effort is per-agent and overrides the global effortLevel; a haiku agent under a global xhigh session still runs cheap."
   ]
